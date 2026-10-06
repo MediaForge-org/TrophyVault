@@ -2,8 +2,9 @@
 
 TrophyVault is intended to become a self-hosted, personal PlayStation trophy and 100%-completion platform.
 
-> **Status: very early development — milestone M0.1 (Project Foundation).**
-> Only the technical foundation exists: project skeleton, Docker development environment, CI, tooling and a health check.
+> **Status: very early development — M0.1 (Project Foundation) is done; M0.2 (Domains & Product Boundaries) is documentation only.**
+> Only the technical foundation exists: project skeleton, Docker development environment, CI, tooling and a health check, plus
+> the architecture documents in [`docs/architecture/`](docs/architecture/README.md). The data model (M0.3) is not designed yet.
 > There is **no** PSN integration, trophy data, guides, completion tracking, dashboard or user accounts yet.
 
 ## Stack
@@ -129,11 +130,11 @@ backend/     Laravel 13 application (API, queue, Horizon)
 frontend/    Vue 3 + TypeScript + Vite + Tailwind SPA (placeholder page)
 docker/      Dockerfiles and configuration (php, node, nginx, postgres)
 scripts/     setup, test-database creation, infrastructure smoke test
-docs/        documentation and decision records
+docs/        architecture documents (docs/architecture) and decision records (docs/decisions)
 .github/     GitHub Actions workflows
 ```
 
-See [`docs/`](docs/README.md) for foundation decisions, and [`CLAUDE.md`](CLAUDE.md) for the project rules (including the git rules for AI assistants).
+See [`docs/`](docs/README.md) for the domain architecture and decisions, and [`CLAUDE.md`](CLAUDE.md) for the project rules (including the git rules for AI assistants).
 
 ## Security notes
 

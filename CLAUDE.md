@@ -24,6 +24,14 @@ Layout: `backend/` (Laravel), `frontend/` (Vue), `docker/`, `scripts/`, `docs/`.
 - Finish every work package with: summary of changes, `git status`, checks run and their results, remaining problems,
   and one proposed commit message — then stop.
 
+## Domain rules (M0.2 — see `docs/architecture/`)
+
+- External providers (PSN, …) never define the domain: `Provider → Adapter → Normalization → Domain`. Provider ids are external identifiers.
+- Canonical, Knowledge and Personal data are strictly separate; references point from personal to shared data only.
+- `Game`, `GameRelease` and `TrophySet` are distinct (no 1:1 assumptions); a `TrophyGroup` is not automatically DLC.
+- Objectives are recursive; Platinum is not completion (no single status enum mixing completion dimensions).
+- The data model is M0.3: do not add business tables/models/migrations or `app/Domain` placeholders before that package decides them.
+
 ## Development principles
 
 - Architecture and quality before blind fast coding — but develop iteratively.
