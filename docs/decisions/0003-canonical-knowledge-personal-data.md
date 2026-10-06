@@ -13,6 +13,6 @@ Example: Objective "Study American Alligator" is knowledge; `UserObjectiveProgre
 
 ## Consequences
 - Guides/trackers are reusable across users; deleting a user cannot damage shared data.
-- M0.3 must model personal data in separate tables that reference shared data; no shared tables with nullable `user_id`.
+- Personal data is modelled in separate tables that reference shared data; no shared tables with nullable `user_id` (implemented in M0.3, see [ADR 0012](0012-account-owned-progress.md)).
 - Some queries need joins across classes; accepted.
 - Details: [`data-classification.md`](../architecture/data-classification.md).

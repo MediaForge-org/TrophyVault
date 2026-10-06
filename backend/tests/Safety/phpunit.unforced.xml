@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    DELIBERATELY UNSAFE phpunit configuration, used only by DatabaseSafetyProcessTest.
+    It does NOT force APP_ENV/DB_DATABASE and does NOT switch to the restricted test role, so the only thing standing
+    between a hostile environment and the database is Tests\TestCase itself. The test runs it against a decoy database
+    name that does not exist, so even a broken guard cannot damage real data.
+-->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="../../vendor/autoload.php"
+         colors="false">
+    <testsuites>
+        <testsuite name="Safety">
+            <directory>../Integration/Safety</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

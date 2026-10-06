@@ -24,13 +24,16 @@ Layout: `backend/` (Laravel), `frontend/` (Vue), `docker/`, `scripts/`, `docs/`.
 - Finish every work package with: summary of changes, `git status`, checks run and their results, remaining problems,
   and one proposed commit message — then stop.
 
-## Domain rules (M0.2 — see `docs/architecture/`)
+## Domain rules (M0.2 — see `docs/architecture/`) and data model (M0.3 — see `docs/data-model/`)
 
 - External providers (PSN, …) never define the domain: `Provider → Adapter → Normalization → Domain`. Provider ids are external identifiers.
 - Canonical, Knowledge and Personal data are strictly separate; references point from personal to shared data only.
 - `Game`, `GameRelease` and `TrophySet` are distinct (no 1:1 assumptions); a `TrophyGroup` is not automatically DLC.
 - Objectives are recursive; Platinum is not completion (no single status enum mixing completion dimensions).
-- The data model is M0.3: do not add business tables/models/migrations or `app/Domain` placeholders before that package decides them.
+- Data model conventions (`docs/data-model/conventions.md`, ADRs 0007–0013): UUIDv7 primary keys; all instants `timestamptz`/UTC (`CarbonImmutable`); closed vocabularies = CHECK + PHP enum (kept in sync by test), extensible ones = lookup tables, no native PG enums; no Laravel soft deletes (`retired_at` for canonical data); JSONB only for unqueried provider/type-specific data and never for secrets, relations or progress; invariants belong in the database (FKs, composite same-owner FKs, partial uniques, CHECKs) *and* get a test.
+- Earned trophy state belongs to the **PSN account** (`psn_account_trophies`), completion is **derived**, never stored. Provider ids live in `external_identifiers`, never as primary keys.
+- Models live in `app/Models/<Domain>/`; create `app/Domain/<Domain>/` only with its first real class. Adding a migration means updating `docs/data-model/` (logical model, ER diagram, roadmap, regenerated data dictionary) — `DocumentationConsistencyTest` enforces it. Never edit a migration that was already committed; add a new one.
+- Tables not yet migrated (guides, objectives, trackers, sync/provenance, planning, …) follow the logical model and roadmap; do not invent variants without an ADR.
 
 ## Development principles
 
@@ -55,7 +58,8 @@ No filler tests; test real behaviour.
   against any database not ending in `_test` — never bypass this guard.
 - Backend (in containers): `make test-backend`, `make lint-backend`, `make analyse`.
 - Frontend: `make test-frontend`, `make lint-frontend`, `make typecheck`, `make build-frontend`.
-- Infrastructure: `make smoke` (stack must be running). `make check` runs everything CI runs.
+- Infrastructure: `make smoke` (stack must be running). Docs: `make docs-check`. `make check` runs everything CI runs.
+- **Database safety (ADR 0014, `docs/data-model/database-safety.md`):** never run `migrate:fresh`/`refresh`/`reset`/`rollback`/`db:wipe` against the dev database, and never use `--env=testing` to pick a database (it only changes a label). Use `make db-fresh-test` (test DB) or `make db-reset-dev CONFIRM=<name>` (deliberate, human decision). Demonstrate or test destructive behaviour only against **nonexistent decoy databases**. The test suite runs as a restricted role on `<db>_test`; do not weaken `phpunit.xml`, `tests/bootstrap.php`, `TestCase`, the guarded commands or `scripts/check-ci.py`.
 - A work package is done only when tests, static analysis, linting/formatting, typecheck, build, Docker healthchecks and docs are green/updated.
 
 ## Environment notes

@@ -4,7 +4,7 @@ APP     := $(COMPOSE) exec -T app
 RUNAPP  := $(COMPOSE) run --rm --no-deps app
 
 .DEFAULT_GOAL := help
-.PHONY: smoke help setup build install up down logs ps migrate fresh test test-backend test-frontend \
+.PHONY: smoke docs-check ci-check db-fresh-test db-reset-dev safety-test help setup build install up down logs ps migrate fresh test test-backend test-frontend \
         lint lint-backend lint-frontend format analyse typecheck build-frontend check
 
 help: ## Show this help
@@ -47,6 +47,25 @@ test: test-backend test-frontend ## All tests
 smoke: ## Infrastructure smoke test against the running stack
 	sh scripts/smoke-test.sh
 
+docs-check: ## Markdown links/anchors + Mermaid syntax (needs python3 and docker)
+	python3 scripts/check-docs.py
+	docker run --rm -u 0 -e HOME=/tmp -v "$(CURDIR)/scripts:/src:ro" -v "$(CURDIR)/docs:/work/docs:ro" -w /work node:22-alpine \
+	  sh -c 'npm init -y >/dev/null && npm i mermaid@12 jsdom@30 --no-audit --no-fund >/dev/null 2>&1 && cp /src/check-mermaid.mjs . && node check-mermaid.mjs /work'
+
+ci-check: ## CI workflow + compose safety rules (python3)
+	python3 scripts/check-ci.py
+	python3 scripts/check-ci.py --selftest
+
+db-fresh-test: ## Rebuild the disposable TEST database (restricted test role, *_test only)
+	sh scripts/ensure-test-db.sh
+	$(COMPOSE) exec -T app sh -c 'DB_DATABASE="$${DB_DATABASE}_test" DB_USERNAME="$$DB_TEST_USERNAME" DB_PASSWORD="$$DB_TEST_PASSWORD" php artisan migrate:fresh --force'
+
+db-reset-dev: ## DESTRUCTIVE: reset the dev DB. Usage: make db-reset-dev CONFIRM=<db name> [WIPE_DATA=yes]
+	sh scripts/db-reset-dev.sh
+
+safety-test: ## Prove tests/commands cannot touch the dev DB (stack must run)
+	sh scripts/safety-test.sh
+
 analyse: ## PHPStan / Larastan
 	$(APP) composer analyse
 
@@ -67,4 +86,4 @@ typecheck: ## vue-tsc
 build-frontend: ## Production build of the frontend
 	$(COMPOSE) exec -T frontend npm run build
 
-check: lint analyse typecheck test build-frontend ## Everything CI runs
+check: lint analyse typecheck test build-frontend docs-check ci-check safety-test ## Everything CI runs

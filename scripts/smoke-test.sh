@@ -49,6 +49,12 @@ ok "web -> frontend"
 docker compose exec -T -e REDISCLI_AUTH= redis redis-cli ping 2>&1 | grep -q NOAUTH || fail "redis accepts unauthenticated connections"
 ok "redis requires a password"
 
+# 5b. The restricted test role cannot reach the development database.
+if docker compose exec -T postgres sh -c 'PGPASSWORD="$TEST_DB_PASSWORD" psql -h 127.0.0.1 -U "$TEST_DB_USER" -d "$POSTGRES_DB" -At -c "select 1"' >/dev/null 2>&1; then
+  fail "the test role can connect to the development database"
+fi
+ok "test role is locked out of the development database"
+
 # 6. Dedicated test database exists.
 docker compose exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d postgres -Atc "select 1 from pg_database where datname = '"'"'${POSTGRES_DB}_test'"'"'"' | grep -q 1 \
   || fail "test database missing (run scripts/ensure-test-db.sh)"

@@ -2,10 +2,10 @@
 
 TrophyVault is intended to become a self-hosted, personal PlayStation trophy and 100%-completion platform.
 
-> **Status: very early development — M0.1 (Project Foundation) is done; M0.2 (Domains & Product Boundaries) is documentation only.**
-> Only the technical foundation exists: project skeleton, Docker development environment, CI, tooling and a health check, plus
-> the architecture documents in [`docs/architecture/`](docs/architecture/README.md). The data model (M0.3) is not designed yet.
-> There is **no** PSN integration, trophy data, guides, completion tracking, dashboard or user accounts yet.
+> **Status: very early development.** M0.1 (Project Foundation) and M0.2 (Domains & Product Boundaries) are done; **M0.3 (PostgreSQL data model)** defines the v1 data architecture
+> ([`docs/data-model/`](docs/data-model/README.md)) and migrates its structural core: reference data, catalog, trophy structure, external identifiers, users/PSN accounts and account trophy progress (20 tables).
+> There is **no** PSN integration, sync, guide/objective/tracker tables, completion engine, dashboard or user-facing UI yet — only the schema, its tests and a health check.
+> The remaining v1 tables are designed but intentionally not migrated until their milestone ([migration roadmap](docs/data-model/migration-roadmap.md)).
 
 ## Stack
 
@@ -43,6 +43,8 @@ Then open <http://127.0.0.1:8190>.
 
 `.env.example` documents every variable. `make setup` copies it to `.env` and generates `APP_KEY`, `DB_PASSWORD` and `REDIS_PASSWORD`.
 `.env` is git-ignored and must never be committed.
+
+> **Existing checkout?** `.env` now needs `DB_TEST_USERNAME` and `DB_TEST_PASSWORD` (restricted role for the test database, see `.env.example`; `docker compose` refuses to start without them). Add them, then run `make up` — `scripts/ensure-test-db.sh` provisions the role and recreates the disposable `<db>_test` database. The development database is not touched.
 
 ### Host port
 
@@ -84,6 +86,7 @@ make test              # backend + frontend
 make test-backend      # PHPUnit against PostgreSQL (trophyvault_test) and Redis
 make test-frontend     # Vitest (headless, jsdom)
 make smoke             # infrastructure smoke test against the running stack
+make docs-check        # Markdown links/anchors + Mermaid syntax of the docs
 ```
 
 ### Development vs. test database
@@ -94,11 +97,15 @@ make smoke             # infrastructure smoke test against the running stack
 | Redis DBs | `0` (default/queue/session), `1` (cache) | `14`, `15`, key prefix `trophyvault-test-` |
 | Created by | `postgres` image on first start | `docker/postgres/init-test-db.sh` (also `scripts/ensure-test-db.sh`) |
 
-Safeguards against tests touching development data:
+Safeguards against tests (and destructive commands) touching development data — layered, see [`docs/data-model/database-safety.md`](docs/data-model/database-safety.md):
 
-1. `backend/phpunit.xml` **forces** `APP_ENV=testing`, `DB_DATABASE=trophyvault_test`, array cache/session, sync queue and separate Redis DBs/prefix — even if the container environment says otherwise.
-2. `Tests\TestCase::createApplication()` aborts with an exception, before any test trait touches the database, unless the environment is `testing` **and** the database name ends in `_test`. The rule itself is unit-tested (`TestDatabaseGuardTest`).
-3. Verified manually: running the suite with `DB_DATABASE=trophyvault APP_ENV=local` in the environment still uses `trophyvault_test` and leaves the development database untouched.
+1. **Restricted database role:** the suite runs as `DB_TEST_USERNAME`, which owns only `<DB_DATABASE>_test` and has no `CONNECT` privilege on the development database (`docker/postgres/init-test-db.sh`, `backend/tests/bootstrap.php`).
+2. `backend/phpunit.xml` **forces** `APP_ENV=testing`, `DB_DATABASE=trophyvault_test`, array cache/session, sync queue and separate Redis DBs/prefix — even if the container environment says otherwise.
+3. `Tests\TestCase` aborts before any test trait touches the database unless the label is `testing`, the configured name ends in `_test` **and** the live connection reports a `*_test` database and the test role.
+4. **Destructive artisan commands** (`migrate:fresh|refresh|reset|rollback`, `db:wipe`) refuse every database that is not `*_test` — whatever `--env` says — unless explicitly named via `TROPHYVAULT_ALLOW_DESTRUCTIVE_DB`. Use the wrappers:
+   - `make db-fresh-test` — rebuild the disposable test database
+   - `make db-reset-dev CONFIRM=<database name>` — deliberate reset of the development database (refuses if it holds data unless `WIPE_DATA=yes`)
+5. `make safety-test` proves it end to end (hostile environment, marker in the dev database); `make ci-check` keeps CI/compose from regressing.
 
 Tests use PostgreSQL — never SQLite.
 
@@ -119,6 +126,7 @@ make check             # everything CI runs
 
 - **backend** — Pint, PHPStan, PHPUnit against PostgreSQL 18 and Redis service containers
 - **frontend** — ESLint, vue-tsc, Vitest, production build
+- **docs** — Markdown links/anchors and Mermaid syntax of the ER diagrams
 - **stack** — `docker compose config`, image build, stack start with healthchecks, `scripts/smoke-test.sh`
 
 No deployment pipeline exists yet.
@@ -130,7 +138,7 @@ backend/     Laravel 13 application (API, queue, Horizon)
 frontend/    Vue 3 + TypeScript + Vite + Tailwind SPA (placeholder page)
 docker/      Dockerfiles and configuration (php, node, nginx, postgres)
 scripts/     setup, test-database creation, infrastructure smoke test
-docs/        architecture documents (docs/architecture) and decision records (docs/decisions)
+docs/        architecture (docs/architecture), data model (docs/data-model), decision records (docs/decisions)
 .github/     GitHub Actions workflows
 ```
 

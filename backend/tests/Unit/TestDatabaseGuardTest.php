@@ -38,4 +38,29 @@ class TestDatabaseGuardTest extends TestCase
 
         TestDatabaseGuard::assertSafe($environment, $database);
     }
+
+    public function test_connected_check_accepts_a_test_database_and_the_expected_role(): void
+    {
+        TestDatabaseGuard::assertConnected('trophyvault_test', 'trophyvault_test', 'trophyvault_test');
+        TestDatabaseGuard::assertConnected('trophyvault_test', 'any_role', null);
+        TestDatabaseGuard::assertConnected('trophyvault_test', 'any_role', '');
+
+        $this->addToAssertionCount(3);
+    }
+
+    public function test_connected_check_rejects_a_live_connection_to_a_non_test_database(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('connected to "trophyvault"');
+
+        TestDatabaseGuard::assertConnected('trophyvault', 'trophyvault_test', 'trophyvault_test');
+    }
+
+    public function test_connected_check_rejects_the_development_role(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('restricted test role');
+
+        TestDatabaseGuard::assertConnected('trophyvault_test', 'trophyvault', 'trophyvault_test');
+    }
 }

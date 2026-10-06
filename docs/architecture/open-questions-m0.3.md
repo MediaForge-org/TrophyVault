@@ -1,5 +1,7 @@
 # Open questions for M0.3 (Data Model)
 
+> **Status: closed in M0.3.** All 27 questions are answered in [`../data-model/open-questions-resolution.md`](../data-model/open-questions-resolution.md) (25 resolved, 1 deferred, 1 superseded). This file is kept as the historical question list.
+
 M0.2 fixes vocabulary and boundaries only. The following were **deliberately not decided**. M0.2 must not be read as having decided any of them.
 
 ## A. Persistence fundamentals

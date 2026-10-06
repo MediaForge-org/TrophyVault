@@ -18,7 +18,7 @@
 
 Games without a Platinum are fully valid games (`not_applicable`, not "missing").
 
-Base Trophy Completion depends on the group classification, which may be `unknown`; how completion is reported for unclassified groups is **Open** (question 12).
+Base Trophy Completion depends on the group classification, which may be `unknown`; decided in M0.3: unclassified groups make base completion *not yet decidable*, they are never assumed to be base ([ADR 0011](../decisions/0011-catalog-and-trophy-structure.md)).
 
 ## Independence  (Decided)
 
@@ -30,7 +30,7 @@ Therefore:
   - **Intent/lifecycle** (not_started, playing, paused, backlog, abandoned) — a *personal* choice about what the user is doing with the game;
   - **Achievement dimensions** (platinumed, trophy_100, ingame_100, full_completion) — *facts* that are (mostly) derived from data.
 - Conceptually `UserGame` holds the lifecycle intent; achievement dimensions are derived or stored as separate facts. The exact storage
-  (derived views vs. stored flags vs. snapshots) is **open** (M0.3).
+  is **decided in M0.3**: achievement dimensions are derived (queries/services), the lifecycle intent is stored on `user_games` ([ADR 0012](../decisions/0012-account-owned-progress.md)).
 
 ## Illustration
 
@@ -46,9 +46,9 @@ Game X (one TrophySet: base group + 2 DLC groups, has Platinum)
 
 ## Where each dimension is computed from
 
-- Trophy dimensions: Player Progress (`UserTrophy`) against Trophies structure (+ group classification).
+- Trophy dimensions: Player Progress (account trophies, [ADR 0012](../decisions/0012-account-owned-progress.md)) against Trophies structure (+ group classification).
 - Ingame: Personal Completion (`UserObjectiveProgress`, `UserTrackerProgress`) against Knowledge (objectives, trackers).
-- Full Completion: a rule over the above; whether the rule is global, per game or per user is **open**.
+- Full Completion: a rule over the above; decided in M0.3: a system-defined default rule in code plus user-defined custom targets ([ADR 0013](../decisions/0013-objectives-trackers-guides.md)).
 - Calculation logic itself is **not implemented in M0.2**.
 
 ## Multi-set games

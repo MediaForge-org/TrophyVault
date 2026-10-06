@@ -1,7 +1,8 @@
 # Architecture documentation (M0.2)
 
-Status of this folder: **M0.2 — Domains & Product Boundaries.** It fixes vocabulary and boundaries. It deliberately does **not**
-define tables, keys, constraints or indexes; that is **M0.3 — Data Model** (see [`open-questions-m0.3.md`](open-questions-m0.3.md)).
+Status of this folder: **M0.2 — Domains & Product Boundaries.** It fixes vocabulary and boundaries and deliberately does **not**
+define tables, keys, constraints or indexes. That was done in **M0.3 — Data Model**: see [`../data-model/`](../data-model/README.md). Statements here marked *Open* were closed there; where they still read as open,
+the [resolution matrix](../data-model/open-questions-resolution.md) is authoritative.
 
 | Document | Content |
 | --- | --- |

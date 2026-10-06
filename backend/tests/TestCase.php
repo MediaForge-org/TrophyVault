@@ -24,6 +24,17 @@ abstract class TestCase extends BaseTestCase
 
         TestDatabaseGuard::assertSafe($app->environment(), $database);
 
+        // Ask the server who we really are (config can lie; the live connection cannot).
+        $connection = $app->make('db')->connection();
+        $currentDatabase = $connection->scalar('select current_database()');
+        $currentUser = $connection->scalar('select current_user');
+        $expectedUser = getenv('DB_TEST_USERNAME');
+        TestDatabaseGuard::assertConnected(
+            is_string($currentDatabase) ? $currentDatabase : '',
+            is_string($currentUser) ? $currentUser : '',
+            $expectedUser === false ? null : $expectedUser,
+        );
+
         return $app;
     }
 }

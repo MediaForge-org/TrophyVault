@@ -19,6 +19,8 @@ x-php: &php
     REDIS_HOST: redis
   volumes:
     - ./backend:/var/www/html
+    # Read-only: DocumentationConsistencyTest checks docs against the real schema (../docs relative to backend).
+    - ./docs:/var/www/docs:ro
   networks: [backend]
   depends_on:
     postgres:
@@ -99,6 +101,9 @@ services:
       POSTGRES_DB: ${DB_DATABASE:?}
       POSTGRES_USER: ${DB_USERNAME:?}
       POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set in .env (run scripts/setup.sh)}
+      # Restricted role for the test database (see docker/postgres/init-test-db.sh and docs/data-model/database-safety.md).
+      TEST_DB_USER: ${DB_TEST_USERNAME:?DB_TEST_USERNAME must be set in .env}
+      TEST_DB_PASSWORD: ${DB_TEST_PASSWORD:?DB_TEST_PASSWORD must be set in .env (run scripts/setup.sh)}
     volumes:
       # PostgreSQL 18 images keep versioned data below /var/lib/postgresql.
       - postgres_data:/var/lib/postgresql

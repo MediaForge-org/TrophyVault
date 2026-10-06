@@ -7,7 +7,7 @@ Terms are used with exactly these meanings in code, docs and issues.
 | Term | Meaning | Not to be confused with |
 | --- | --- | --- |
 | **Game** | The work, independent of platform release. "Grand Theft Auto V" is one Game. | A platform release; a trophy set |
-| **GameRelease** | One concrete published variant of a Game (platform, region, edition, …). Cardinality towards Platform/Region/Edition is **Open** (M0.3). | A Game; a TrophySet |
+| **GameRelease** | One concrete published variant of a Game (platform, region, edition, …). Decided in M0.3: n:m to Platform, exactly one Region (`unknown`/`global` are values), optional Edition of the same Game ([ADR 0011](../decisions/0011-catalog-and-trophy-structure.md)). | A Game; a TrophySet |
 | **Edition** | Standard, Deluxe, Complete, … A release/edition concept, **not** a separate Game. | A Game |
 | **Platform / Region** | Where/for whom a release exists (PS3, PS4, PS5, …; regions). | |
 | **GameRelation** | A relation between Games: e.g. `remake_of`, `remaster_of`, `sequel_to`, `prequel_to`, `collection_contains`, `related` (Conceptual, not a fixed enum). | |
@@ -29,7 +29,7 @@ Terms are used with exactly these meanings in code, docs and issues.
 | **Objective** | A node in a recursive tree of "things to do". Meaning is given by its *type* (trophy, mission, collectible, challenge, animal, location, activity, requirement, counter, checklist, chapter, category, custom — Conceptual, extensible). Objectives are general knowledge. |
 | **ObjectiveRelation** | Relation between objectives beyond the tree (e.g. requires, supersedes) — Conceptual. |
 | **TrackerDefinition** | Data-driven definition of a tracker (boolean, counter, percentage, checklist, hierarchical, derived — Conceptual) so a new game checklist needs data, not code. |
-| **Source / Provenance** | Where a piece of information came from: provider, external id, URL, retrieval time, version/hash (Conceptual shape). |
+| **Source / Provenance** | Where a piece of information came from: provider, external id, URL, retrieval time, version/hash. Cross-cutting: provenance rows point at canonical and knowledge rows ([ADR 0010](../decisions/0010-provenance-and-sync-model.md)). |
 
 ## Personal
 
@@ -37,10 +37,11 @@ Terms are used with exactly these meanings in code, docs and issues.
 | --- | --- |
 | **User** | Local TrophyVault user. |
 | **PsnAccount** | A linked PlayStation account. Not the same thing as a User. |
-| **UserGame / UserTrophySet / UserTrophy** | A user's personal relationship to a game / trophy set / earned trophy (with timestamp). |
+| **UserGame** | A user's personal relationship to a game (lifecycle intent, notes). |
+| **Account trophy set / account trophy** (M0.3; replaces *UserTrophySet*/*UserTrophy*) | A PSN account's holding of a trophy list / one earned trophy (with `earned_at`). Earned state belongs to the PSN account, not directly to the user ([ADR 0012](../decisions/0012-account-owned-progress.md)). |
 | **ProgressSnapshot** | A point-in-time record of progress for history. Not event sourcing. |
 | **UserObjectiveProgress** | The user's state for an Objective. **Example:** Objective "Study American Alligator" is knowledge; "this user has studied it" is `UserObjectiveProgress`. |
-| **UserTracker / UserTrackerProgress** | A user's instance of a TrackerDefinition and its progress. |
+| **UserTrackerProgress** (M0.3; *UserTracker* merged into it) | A user's progress value for a TrackerDefinition; "activated" = row exists. |
 
 ## Completion and planning
 
@@ -64,4 +65,4 @@ Terms are used with exactly these meanings in code, docs and issues.
 | **Adapter** | Provider-specific code that fetches and translates provider data. |
 | **Normalization** | Translating provider shapes into domain concepts. |
 | **ExternalRecord** | A stored raw/semi-raw provider record used for traceability and change detection. |
-| **ImportRun / SyncRun / SyncError** | One execution of an import/sync, and what went wrong during it. |
+| **ImportRun / SyncError** (M0.3; *SyncRun* is the same thing as *ImportRun*, distinguished by `run_type`) | One execution of an import/sync, and what went wrong during it. |

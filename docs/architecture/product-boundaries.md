@@ -13,7 +13,7 @@ Three ingredients, always kept apart (see [`data-classification.md`](data-classi
 The point of the product: a game is **not** finished just because the Platinum popped. TrophyVault models the stricter
 definitions players actually use (all trophy groups, in-game 100 %, custom goals) — see [`completion-semantics.md`](completion-semantics.md).
 
-It is self-hosted and personal: one installation is run by its owner; there is no central service. Whether it supports one or several local users is **Open** (question 19).
+It is self-hosted and personal: one installation is run by its owner; there is no central service. The schema is multi-user capable from day one; the first release can run single-user ([ADR 0012](../decisions/0012-account-owned-progress.md)).
 
 ## What TrophyVault is not  (Decided)
 

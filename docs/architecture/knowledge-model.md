@@ -26,9 +26,9 @@ Zoologist                          Gold Rush                        100 % Comple
 - A node's *meaning* comes from its **type** (trophy, mission, collectible, challenge, animal, location, activity, requirement, counter,
   checklist, chapter, category, custom — extensible, not a closed list).
 - **No table per type, and no wide table with dozens of nullable special columns.** Type-specific details are data of the node;
-  how that is stored (normalized columns, JSONB, or a mix) is decided in M0.3.
+  M0.3 decided: type in a lookup table, type-specific optional settings in unqueried JSONB, anything filtered becomes a column ([ADR 0013](../decisions/0013-objectives-trackers-guides.md)).
 - Beyond the tree, `ObjectiveRelation` can express non-hierarchical links (e.g. a trophy objective that is satisfied by a subtree).
-  The relation kinds are open.
+  M0.3 fixed the v1 kinds: `satisfies`, `relates_to`, `requires` (others reserved).
 - Objectives are **general knowledge**. A user's state for an objective is `UserObjectiveProgress` (personal); see [`data-classification.md`](data-classification.md).
 
 ## Trackers
@@ -44,5 +44,5 @@ Challenges
 └── Master Hunter · Sharpshooter · Survivalist · Weapons Expert
 ```
 
-A new game checklist should be addable as a data/guide pack. A user's instance is `UserTracker` with `UserTrackerProgress`.
-Whether tracker definitions *are* objective trees, *reference* them, or are a separate structure is **open** (M0.3).
+A new game checklist should be addable as a data/guide pack. A user's progress is a `UserTrackerProgress` row (M0.3 merged the separate `UserTracker` instance into it).
+**Decided in M0.3:** a tracker is an aggregation definition *over* objectives (it references a subtree), not a second tree; derived trackers use a closed, code-defined strategy registry ([ADR 0013](../decisions/0013-objectives-trackers-guides.md)).

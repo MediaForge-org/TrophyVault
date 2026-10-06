@@ -12,7 +12,7 @@ Completion, Ingame Completion, Custom Completion and TrophyVault Full Completion
 mix them; user *intent* (not started, playing, paused, backlog, abandoned) is separated from achievement *dimensions* (platinum, trophy 100 %, ingame 100 %, full).
 
 ## Consequences
-- `UserGame` cannot be a single "status" column; M0.3 decides how dimensions are stored (derived vs. stored).
+- `UserGame` cannot be a single "status" column; M0.3 decided: dimensions are derived, intent is stored ([ADR 0012](0012-account-owned-progress.md)).
 - Games without Platinum are first-class.
 - Calculation logic and the definition of Full Completion (global/per game/per user) come later.
 - Details: [`completion-semantics.md`](../architecture/completion-semantics.md).

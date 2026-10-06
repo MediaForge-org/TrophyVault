@@ -16,5 +16,5 @@ have different releases and often different trophy lists, sometimes shared ones.
 
 ## Consequences
 - Stacks, remasters and auto-pop can be expressed without hacks.
-- The Catalog↔Trophies link and cardinalities are explicitly **open** for M0.3 (not decided here).
+- The Catalog↔Trophies link and cardinalities were left open here and **decided in M0.3** ([ADR 0011](0011-catalog-and-trophy-structure.md)).
 - Relation kind lists are conceptual, not a fixed enum.

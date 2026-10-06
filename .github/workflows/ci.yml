@@ -110,6 +110,30 @@ jobs:
       - name: Production build
         run: npm run build
 
+  docs:
+    name: Repository checks (docs, CI/compose safety)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Links and anchors
+        run: python3 scripts/check-docs.py
+
+      - name: CI and compose safety (no dev database, no exposed data services)
+        run: python3 scripts/check-ci.py && python3 scripts/check-ci.py --selftest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Mermaid syntax
+        run: |
+          mkdir "$RUNNER_TEMP/mermaid" && cd "$RUNNER_TEMP/mermaid"
+          npm init -y >/dev/null
+          npm i mermaid@12 jsdom@30 --no-audit --no-fund
+          cp "$GITHUB_WORKSPACE/scripts/check-mermaid.mjs" .
+          node check-mermaid.mjs "$GITHUB_WORKSPACE"
+
   stack:
     name: Docker stack (config, healthchecks, smoke test)
     runs-on: ubuntu-latest
