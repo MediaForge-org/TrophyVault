@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         failOnWarning="true"
+         failOnRisky="true"
+         failOnDeprecation="true"
+>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory>tests/Integration</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>app</directory>
+        </include>
+    </source>
+    <!--
+        force="true" makes these values win over variables already present in the
+        container environment (e.g. the development DB_DATABASE). Laravel reads $_SERVER
+        first, so every override is set both as <env> and as <server>. Tests can therefore
+        never be pointed at the development database by accident.
+        Tests::TestCase additionally aborts if the database name does not end in "_test".
+    -->
+    <php>
+        <env name="APP_ENV" value="testing" force="true"/>
+        <env name="APP_DEBUG" value="true" force="true"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file" force="true"/>
+        <env name="LOG_CHANNEL" value="null" force="true"/>
+        <env name="BCRYPT_ROUNDS" value="4" force="true"/>
+        <env name="BROADCAST_CONNECTION" value="null" force="true"/>
+        <env name="MAIL_MAILER" value="array" force="true"/>
+        <env name="DB_CONNECTION" value="pgsql" force="true"/>
+        <env name="DB_URL" value="" force="true"/>
+        <env name="DB_DATABASE" value="trophyvault_test" force="true"/>
+        <env name="CACHE_STORE" value="array" force="true"/>
+        <env name="SESSION_DRIVER" value="array" force="true"/>
+        <env name="QUEUE_CONNECTION" value="sync" force="true"/>
+        <env name="REDIS_DB" value="14" force="true"/>
+        <env name="REDIS_CACHE_DB" value="15" force="true"/>
+        <env name="REDIS_PREFIX" value="trophyvault-test-" force="true"/>
+        <env name="HORIZON_PREFIX" value="trophyvault-test:" force="true"/>
+        <server name="APP_ENV" value="testing" force="true"/>
+        <server name="APP_DEBUG" value="true" force="true"/>
+        <server name="APP_MAINTENANCE_DRIVER" value="file" force="true"/>
+        <server name="LOG_CHANNEL" value="null" force="true"/>
+        <server name="BCRYPT_ROUNDS" value="4" force="true"/>
+        <server name="BROADCAST_CONNECTION" value="null" force="true"/>
+        <server name="MAIL_MAILER" value="array" force="true"/>
+        <server name="DB_CONNECTION" value="pgsql" force="true"/>
+        <server name="DB_URL" value="" force="true"/>
+        <server name="DB_DATABASE" value="trophyvault_test" force="true"/>
+        <server name="CACHE_STORE" value="array" force="true"/>
+        <server name="SESSION_DRIVER" value="array" force="true"/>
+        <server name="QUEUE_CONNECTION" value="sync" force="true"/>
+        <server name="REDIS_DB" value="14" force="true"/>
+        <server name="REDIS_CACHE_DB" value="15" force="true"/>
+        <server name="REDIS_PREFIX" value="trophyvault-test-" force="true"/>
+        <server name="HORIZON_PREFIX" value="trophyvault-test:" force="true"/>
+    </php>
+</phpunit>

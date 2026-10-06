@@ -1,0 +1,34 @@
+# Environment and secrets - never commit
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
+*.p12
+auth.json
+# Future PSN / provider credentials, tokens and sessions
+*.npsso
+npsso*
+psn-*.json
+cookies*.txt
+cookies*.json
+*.cookies
+storage-state*.json
+.credentials/
+
+# Dependencies and build output
+node_modules/
+vendor/
+dist/
+coverage/
+.phpunit.cache/
+.phpunit.result.cache
+*.log
+
+# Local tooling
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+.claude/settings.local.json
